@@ -4,6 +4,13 @@ import { render } from "react-dom";
 
 const ComponentWithConnection = () => {
   const { status, connection } = useConnection();
+  useEffect(() => {
+    console.log({ connection });
+    if (connection) {
+      console.log('Send!');
+      connection.send("Hello!");
+    }
+  });
   return createElement("p", undefined, `Connection: ${status} ${connection ? connection.id : ''}`);
 };
 
@@ -18,6 +25,8 @@ const App = () => {
       const onData = (data) => {
         console.log({ connection, data });
       };
+
+      connection.on("data", onData);
 
       effects.push(() => {
         connection.removeListener("data", onData);
