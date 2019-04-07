@@ -1,0 +1,45 @@
+{
+  "name": "react-peer",
+  "version": "1.0.0",
+  "description": "Peer.js React component",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build-react-component",
+    "clean": "nwb clean-module && nwb clean-demo",
+    "prepublishOnly": "npm run build",
+    "start": "nwb serve-react-demo"
+  },
+  "peerDependencies": {
+    "peerjs": "^0.3.24",
+    "react": "16.x"
+  },
+  "devDependencies": {
+    "peerjs": "^0.3.24",
+    "nwb": "0.23.x",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "homepage": "https://github.com/o-network/react-peer",
+  "bugs": {
+    "url": "https://github.com/o-network/react-peer/issues",
+    "email": "react-peer@open-network.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/o-network/react-peer.git"
+  },
+  "contributors": [
+    {
+      "name": "Fabian Cook",
+      "email": "fabian.cook@open-network.dev",
+      "url": "https://github.com/fabiancook"
+    }
+  ]
+}
