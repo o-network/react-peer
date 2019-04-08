@@ -1,5 +1,5 @@
 {
-  "name": "react-peer",
+  "name": "@opennetwork/react-peer",
   "version": "1.0.0",
   "description": "Peer.js React component",
   "main": "lib/index.js",
