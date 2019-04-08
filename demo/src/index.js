@@ -1,6 +1,10 @@
 import { createElement, useMemo } from "react";
-import { createPeer, PeerProvider, ConnectionProvider, useConnection, STATUS_PEERED, useConnections, useData } from '../../src';
+import { createPeer, PeerProvider, ConnectionProvider, useConnection, STATUS_PEERED, useConnections, useData, withConnection } from '../../src';
 import { render } from "react-dom";
+
+const ComponentWithConnectionNoHooks = withConnection(({ connection, connectionStatus }) => {
+  return createElement("p", undefined, `No hooks Connection: ${connectionStatus} ${connection ? connection.id : ''}`);
+});
 
 const ComponentWithConnection = () => {
   const { status, connection } = useConnection();
@@ -37,7 +41,10 @@ const App = () => {
         peer,
         id: otherId
       },
-      createElement(ComponentWithConnection)
+      [
+        createElement(ComponentWithConnection, { key: 1 }),
+        createElement(ComponentWithConnectionNoHooks, { key: 2 })
+      ]
     )
   )
 };

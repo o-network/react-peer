@@ -1,8 +1,8 @@
-import { createElement, forwardRef, useContext } from "react";
+import { memo, createElement, forwardRef, useContext } from "react";
 import PeerContext from "./context.js";
 
 export default (Component) => {
-  return forwardRef((props, ref) => {
+  return memo(forwardRef((props, ref) => {
     const { peer, status: peerStatus, id: peerId } = useContext(PeerContext);
     return createElement(
       Component,
@@ -14,5 +14,5 @@ export default (Component) => {
         ref
       }
     );
-  });
+  }));
 }
