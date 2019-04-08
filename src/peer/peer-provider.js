@@ -2,6 +2,7 @@ import {createElement, useEffect, useMemo, useState} from "react";
 import ContextPrototype from "./context.js";
 import Peer from "peerjs";
 import { STATUS_CLOSED, STATUS_DISCONNECTED, STATUS_INITIALIZING, STATUS_READY } from "./status";
+import useEvent from "../use-event";
 
 export function createPeer(suppliedPeer = undefined, id = undefined, options = undefined) {
   const peer = useMemo(() => suppliedPeer || new Peer(id, options), [suppliedPeer, id, options]);
@@ -21,24 +22,31 @@ export function createPeer(suppliedPeer = undefined, id = undefined, options = u
     setStatus(STATUS_CLOSED);
   }
 
-  // We want to be able to clean up after
   useEffect(() => {
-    if (peer.destroyed) {
+    if (peer && peer.destroyed) {
       onClosed();
-    } else if (peer.disconnected) {
+    } else if (peer && peer.disconnected) {
       onDisconnected();
-    } else if (peer.id) {
+    } else if (peer && peer.id) {
       onReady();
     }
-    peer.on("open", onReady);
-    peer.on("disconnected", onDisconnected);
-    peer.on("close", onClosed);
-    return () => {
-      peer.removeListener("open", onReady);
-      peer.removeListener("disconnected", onDisconnected);
-      peer.removeListener("close", onClosed);
-    }
   });
+
+  useEvent(
+    [
+      "open",
+      "disconnected",
+      "close"
+    ],
+    peer,
+    (unused, event) => {
+      switch (event) {
+        case "open": return onReady();
+        case "disconnected": return onDisconnected();
+        case "close": return onClosed();
+      }
+    }
+  );
 
   return {
     status,

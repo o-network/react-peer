@@ -1,5 +1,5 @@
-import { createElement, useEffect, useReducer, useMemo } from "react";
-import { createPeer, PeerProvider, ConnectionProvider, useConnection, STATUS_PEERED } from '../../src';
+import { createElement, useMemo } from "react";
+import { createPeer, PeerProvider, ConnectionProvider, useConnection, STATUS_PEERED, useConnections, useData } from '../../src';
 import { render } from "react-dom";
 
 const ComponentWithConnection = () => {
@@ -17,33 +17,14 @@ const App = () => {
   const { peer } = createPeer();
   const { peer: peerOther, id: otherId } = createPeer();
 
-  const [connections, onConnection] = useReducer((connections, connection) => {
-    return connections
-      .filter(other => other.id === connection.id)
-      .concat(connection);
-  }, []);
+  const connectionsOther = useConnections(peerOther);
 
-  useEffect(() => {
-    const effects = [];
-
-    connections
-      .forEach(connection => {
-        const onData = (data) => {
-          console.log({ connection, data });
-        };
-        connection.on("data", onData);
-        effects.push(() => {
-          connection.removeListener("data", onData);
-        });
-      });
-
-    const onConnectionIgnoreEvent = connection => onConnection(connection);
-    peerOther.on("connection", onConnectionIgnoreEvent);
-    return () => {
-      peerOther.removeListener("connection", onConnectionIgnoreEvent);
-      effects.forEach(fn => fn());
-    }
-  });
+  useData(
+    (data, connection) => {
+      console.log({ connection, data });
+    },
+    connectionsOther
+  );
 
   return createElement(
     PeerProvider,

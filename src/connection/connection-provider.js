@@ -2,6 +2,7 @@ import {createElement, useEffect, useMemo, useState} from "react";
 import ContextPrototype from "./context.js";
 import usePeer from "../peer/use-peer";
 import {STATUS_PEERED, STATUS_PEERING} from "./status";
+import useEvent from "../use-event";
 
 export function createConnection(suppliedConnection = undefined, id = undefined, options = undefined) {
   const { peer, status: peerStatus, id: peerId } = usePeer();
@@ -20,17 +21,12 @@ export function createConnection(suppliedConnection = undefined, id = undefined,
   }
 
   useEffect(() => {
-    if (!connection) {
-      return;
-    }
-    if (connection.open) {
+    if (connection && connection.open) {
       onOpen();
     }
-    connection.on('open', onOpen);
-    return () => {
-      connection.removeListener("open", onOpen);
-    }
   });
+
+  useEvent("open", connection, () => onOpen());
 
   return {
     peerStatus,
