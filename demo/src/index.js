@@ -1,16 +1,15 @@
-import { createElement, useEffect } from "react";
-import { createPeer, PeerProvider, ConnectionProvider, useConnection } from '../../src';
+import { createElement, useEffect, useReducer, useMemo } from "react";
+import { createPeer, PeerProvider, ConnectionProvider, useConnection, STATUS_PEERED } from '../../src';
 import { render } from "react-dom";
 
 const ComponentWithConnection = () => {
   const { status, connection } = useConnection();
-  useEffect(() => {
-    console.log({ connection });
-    if (connection) {
-      console.log('Send!');
+  useMemo(() => {
+    if (connection && status === STATUS_PEERED) {
+      console.log('Sent!');
       connection.send("Hello!");
     }
-  });
+  }, [status, connection]);
   return createElement("p", undefined, `Connection: ${status} ${connection ? connection.id : ''}`);
 };
 
@@ -18,28 +17,30 @@ const App = () => {
   const { peer } = createPeer();
   const { peer: peerOther, id: otherId } = createPeer();
 
+  const [connections, onConnection] = useReducer((connections, connection) => {
+    return connections
+      .filter(other => other.id === connection.id)
+      .concat(connection);
+  }, []);
+
   useEffect(() => {
     const effects = [];
 
-    const onConnection = (connection) => {
-      const onData = (data) => {
-        console.log({ connection, data });
-      };
-
-      connection.on("data", onData);
-
-      effects.push(() => {
-        connection.removeListener("data", onData);
+    connections
+      .forEach(connection => {
+        const onData = (data) => {
+          console.log({ connection, data });
+        };
+        connection.on("data", onData);
+        effects.push(() => {
+          connection.removeListener("data", onData);
+        });
       });
-    };
 
-    Object.keys(peerOther.connections)
-      .forEach(id => peerOther.connections[id].forEach(onConnection));
-
-    peerOther.on("connection", onConnection);
-
+    const onConnectionIgnoreEvent = connection => onConnection(connection);
+    peerOther.on("connection", onConnectionIgnoreEvent);
     return () => {
-      peerOther.removeListener("connection", onConnection);
+      peerOther.removeListener("connection", onConnectionIgnoreEvent);
       effects.forEach(fn => fn());
     }
   });
