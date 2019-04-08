@@ -1,4 +1,4 @@
-import {createElement, useEffect, useMemo, useState} from "react";
+import { memo, createElement, useEffect, useMemo, useState } from "react";
 import ContextPrototype from "./context.js";
 import usePeer from "../peer/use-peer";
 import {STATUS_PEERED, STATUS_PEERING} from "./status";
@@ -37,7 +37,7 @@ export function createConnection(suppliedConnection = undefined, id = undefined,
   }
 }
 
-export default function ConnectionProvider({ connection: suppliedConnection = undefined, id = undefined, options = undefined, children }) {
+export default memo(function ConnectionProvider({ connection: suppliedConnection = undefined, id = undefined, options = undefined, children }) {
   const value = createConnection(suppliedConnection, id, options);
   return createElement(
     ContextPrototype.Provider,
@@ -46,4 +46,4 @@ export default function ConnectionProvider({ connection: suppliedConnection = un
     },
     children
   );
-}
+});

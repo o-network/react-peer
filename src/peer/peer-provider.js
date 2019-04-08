@@ -1,4 +1,4 @@
-import {createElement, useEffect, useMemo, useState} from "react";
+import { memo, createElement, useEffect, useMemo, useState } from "react";
 import ContextPrototype from "./context.js";
 import Peer from "peerjs";
 import { STATUS_CLOSED, STATUS_DISCONNECTED, STATUS_INITIALIZING, STATUS_READY } from "./status";
@@ -55,7 +55,7 @@ export function createPeer(suppliedPeer = undefined, id = undefined, options = u
   }
 }
 
-export default function ({ peer: suppliedPeer = undefined, id = undefined, options = undefined, children }) {
+export default memo(function PeerProvider({ peer: suppliedPeer = undefined, id = undefined, options = undefined, children }) {
   const value = createPeer(suppliedPeer, id, options);
   return createElement(
     ContextPrototype.Provider,
@@ -64,4 +64,4 @@ export default function ({ peer: suppliedPeer = undefined, id = undefined, optio
     },
     children
   );
-}
+})
